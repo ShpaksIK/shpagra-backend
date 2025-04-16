@@ -43,7 +43,7 @@ const requestUserProfileArticles = (authId) => {
     return {profileArticles, draftArticles, moderationArticles}
 }
 
-const likeArticle = (profileId, articleId, authId) => {
+const createLikeArticle = (profileId, articleId, authId) => {
     for (let i = 0; i <= articles[`${profileId}`].length; i++) {
         if (articles[`${profileId}`][i].id == articleId) {
             if (articles[`${profileId}`][i].likes_id.filter(id => id === authId).length === 1) {
@@ -59,10 +59,34 @@ const likeArticle = (profileId, articleId, authId) => {
     return 1
 }
 
+const requestArticleData = (articleId) => {
+    const metaArticle = Object.values(articles)
+    .flatMap(articleArray => articleArray)
+    .find(article => article.id == articleId)
+    const fullArticle = {
+        ...metaArticle,
+        ...articles_content[articleId]
+    }
+    return fullArticle
+}
+
+const requestArticlePreview = (articleId) => {
+    const metaArticle = Object.values(articles)
+    .flatMap(articleArray => articleArray)
+    .find(article => article.id == articleId)
+    const fullArticle = {
+        ...metaArticle,
+        ...articles_content[articleId]
+    }
+    return fullArticle
+}
+
 
 module.exports = {
     requestMainArticles,
     requestProfileArticles,
     requestUserProfileArticles,
-    likeArticle
+    createLikeArticle,
+    requestArticleData,
+    requestArticlePreview
 }

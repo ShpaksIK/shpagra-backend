@@ -1,4 +1,4 @@
-const { requestMainArticles, requestProfileArticles, requestUserProfileArticles, likeArticle } = require('../model/article')
+const { requestMainArticles, requestProfileArticles, requestUserProfileArticles, createLikeArticle, requestArticleData, requestArticlePreview } = require('../model/article')
 const { users, posts, articles, articles_content, articles_draft, articles_to_moderation, comments } = require('./../db')
 const responseSchema = require('./../utils/responceSchema')
 
@@ -39,10 +39,9 @@ const getUserProfileArticles = (req, res) => {
 }
 
 // Лайк статьи
-const likeArticleAPI = (req, res) => {
-    console.log(req.body)
+const likeArticle = (req, res) => {
     const { profileId, articleId, authId } = req.body
-    const isLikedArticle = likeArticle(profileId, articleId, authId)
+    const isLikedArticle = createLikeArticle(profileId, articleId, authId)
     if (isLikedArticle) {
         res.status(200)
     } else {
@@ -50,11 +49,34 @@ const likeArticleAPI = (req, res) => {
     }
 }
 
+// Получение всей статьи
+const getArticleData = (req, res) => {
+    const articleId = req.params.articleId 
+    const fullArticle = requestArticleData(articleId)
+    if (fullArticle) {
+        res.status(200).json(responseSchema({
+            'article': fullArticle
+        }))
+    } else {
+        res.status(500)
+    }
+}
+
+// Получение части статьи. Нужно для ленты
+const getArticlePreview = (req, res) => {
+    const articleId = req.params.articleId 
+    const previewArticle = requestArticlePreview(articleId)
+    res.status(200).json(responseSchema({
+        'article': previewArticle
+    }))
+}
 
 
 module.exports = {
     getMainArticles,
     getProfileArticles,
     getUserProfileArticles,
-    likeArticleAPI
+    likeArticle,
+    getArticleData,
+    getArticlePreview
 }

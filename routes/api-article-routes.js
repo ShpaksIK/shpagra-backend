@@ -1,14 +1,18 @@
 const express = require('express')
-const { likeArticleAPI, getProfileArticles } = require('../controllers/api-article-controller')
+const { likeArticle, getArticleData, getArticlePreview } = require('../controllers/api-article-controller')
 const router = express.Router()
 
 
 router.get('/article/:articleId', (req, res) => {
-    getProfileArticles(req, res)
+    getArticleData(req, res)
+})
+
+router.get('/article-preview/:articleId', (req, res) => {
+    getArticlePreview(req, res)
 })
 
 router.post('/article-like', (req, res) => {
-    likeArticleAPI(req, res)
+    likeArticle(req, res)
 })
 
 
