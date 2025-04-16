@@ -1,4 +1,4 @@
-const { requestMainArticles, requestProfileArticles, requestUserProfileArticles } = require('../model/article')
+const { requestMainArticles, requestProfileArticles, requestUserProfileArticles, likeArticle } = require('../model/article')
 const { users, posts, articles, articles_content, articles_draft, articles_to_moderation, comments } = require('./../db')
 const responseSchema = require('./../utils/responceSchema')
 
@@ -38,9 +38,23 @@ const getUserProfileArticles = (req, res) => {
     }))
 }
 
+// Лайк статьи
+const likeArticleAPI = (req, res) => {
+    console.log(req.body)
+    const { profileId, articleId, authId } = req.body
+    const isLikedArticle = likeArticle(profileId, articleId, authId)
+    if (isLikedArticle) {
+        res.status(200)
+    } else {
+        res.status(500)
+    }
+}
+
+
 
 module.exports = {
     getMainArticles,
     getProfileArticles,
-    getUserProfileArticles
+    getUserProfileArticles,
+    likeArticleAPI
 }

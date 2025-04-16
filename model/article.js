@@ -43,9 +43,26 @@ const requestUserProfileArticles = (authId) => {
     return {profileArticles, draftArticles, moderationArticles}
 }
 
+const likeArticle = (profileId, articleId, authId) => {
+    for (let i = 0; i <= articles[`${profileId}`].length; i++) {
+        if (articles[`${profileId}`][i].id == articleId) {
+            if (articles[`${profileId}`][i].likes_id.filter(id => id === authId).length === 1) {
+                articles[`${profileId}`][i].likes_count -= 1
+                articles[`${profileId}`][i].likes_id = articles[`${profileId}`][i].likes_id.filter(id => id !== authId)
+                break
+            }
+            articles[`${profileId}`][i].likes_count += 1
+            articles[`${profileId}`][i].likes_id = [authId, ...articles[`${profileId}`][i].likes_id]
+            break
+        }
+    }
+    return 1
+}
+
 
 module.exports = {
     requestMainArticles,
     requestProfileArticles,
-    requestUserProfileArticles
+    requestUserProfileArticles,
+    likeArticle
 }
