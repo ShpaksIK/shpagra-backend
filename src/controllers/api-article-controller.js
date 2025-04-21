@@ -1,14 +1,14 @@
 const ArticleModel = require('../models/article')
-const commentSchema = require('../utils/schemes/commentSchema')
-const reactionSchema = require('../utils/schemes/reactionSchema')
-const articleSchema = require('../utils/schemes/articleSchema')
+const commentSchema = require('../utils/schemes/comment-schema')
+const reactionSchema = require('../utils/schemes/reaction-schema')
+const articleSchema = require('../utils/schemes/article-schema')
 
 
 const authId = 1 // для теста
 
 // Получение превью рекомендуемых статей
-const getRecommendedArticlesPreview = (req, res) => {
-    const recommendedArticlesPreview = ArticleModel.getArticles()
+const getRecommendedArticlesPreview = async (req, res) => {
+    const recommendedArticlesPreview = await ArticleModel.getArticles()
     if (recommendedArticlesPreview) {
         res.status(200).json(recommendedArticlesPreview)
     } else {
@@ -17,9 +17,9 @@ const getRecommendedArticlesPreview = (req, res) => {
 }
 
 // Получение статьи
-const getArticle = (req, res) => {
+const getArticle = async (req, res) => {
     const articleId = req.params.articleId
-    const article = ArticleModel.getArticle(articleId)
+    const article = await ArticleModel.getArticle(articleId)
     if (article) {
         res.status(200).json(article)
     } else {
@@ -28,9 +28,9 @@ const getArticle = (req, res) => {
 }
 
 // Создание статьи
-const createArticle = (req, res) => {
+const createArticle = async (req, res) => {
     const { userId, title, description, banner, content } = req.body
-    const newArticle = ArticleModel.createArticle(articleSchema(
+    const newArticle = await ArticleModel.createArticle(articleSchema(
         userId, title, description, banner, content
     ))
     if (newArticle) {
@@ -43,9 +43,9 @@ const createArticle = (req, res) => {
 }
 
 // Обновление статьи
-const updateArticle = (req, res) => {
+const updateArticle = async (req, res) => {
     const { userId, title, description, banner, content } = req.body
-    const updatedArticle = ArticleModel.updateArticle(articleSchema(
+    const updatedArticle = await ArticleModel.updateArticle(articleSchema(
         userId, title, description, banner, content
     ))
     if (updatedArticle) {
@@ -56,9 +56,9 @@ const updateArticle = (req, res) => {
 }
 
 // Удаление статьи
-const deleteArticle = (req, res) => {
+const deleteArticle = async (req, res) => {
     const articleId = req.params.articleId
-    const deletedArticle = ArticleModel.deleteArticle(articleId)
+    const deletedArticle = await ArticleModel.deleteArticle(articleId)
     if (deletedArticle) {
         res.status(204)
     } else {
@@ -67,9 +67,9 @@ const deleteArticle = (req, res) => {
 }
 
 // Получение реакций статьи
-const getArticleReactions = (req, res) => {
+const getArticleReactions = async (req, res) => {
     const articleId = req.params.articleId
-    const articleReactions = ArticleModel.getArticleReactions(articleId)
+    const articleReactions = await ArticleModel.getArticleReactions(articleId)
     if (articleReactions) {
         res.status(200).json(articleReactions)
     } else {
@@ -78,9 +78,9 @@ const getArticleReactions = (req, res) => {
 }
 
 // Добавление реакции на статью
-const createArticleReaction = (req, res) => {
+const createArticleReaction = async (req, res) => {
     const { userId, relatedId, content } = req.body
-    const newReaction = ArticleModel.createArticleReaction(reactionSchema(
+    const newReaction = await ArticleModel.createArticleReaction(reactionSchema(
         userId, relatedId, content
     ))
     if (newReaction) {
@@ -93,9 +93,9 @@ const createArticleReaction = (req, res) => {
 }
 
 // Удаление реакции статьи
-const deleteArticleReaction = (req, res) => {
+const deleteArticleReaction = async (req, res) => {
     const reactionId = req.params.reactionId
-    const deletedReaction = ArticleModel.deleteArticleReaction(reactionId)
+    const deletedReaction = await ArticleModel.deleteArticleReaction(reactionId)
     if (deletedReaction) {
         res.status(204)
     } else {
@@ -104,9 +104,9 @@ const deleteArticleReaction = (req, res) => {
 }
 
 // Получение комментариев статьи
-const getArticleComments = (req, res) => {
+const getArticleComments = async (req, res) => {
     const articleId = req.params.articleId
-    const articleComments = ArticleModel.getArticleComments(articleId)
+    const articleComments = await ArticleModel.getArticleComments(articleId)
     if (articleComments) {
         res.status(200).json(articleComments)
     } else {
@@ -115,9 +115,9 @@ const getArticleComments = (req, res) => {
 }
 
 // Добавление комментария на статью
-const createArticleComment = (req, res) => {
+const createArticleComment = async (req, res) => {
     const { userId, relatedId, parentCommentId, content } = req.body
-    const newComment = ArticleModel.createArticleComment(commentSchema(
+    const newComment = await ArticleModel.createArticleComment(commentSchema(
         userId, relatedId, parentCommentId, content
     ))
     if (newComment) {
@@ -130,9 +130,9 @@ const createArticleComment = (req, res) => {
 }
 
 // Обновление комментария статьи
-const updateArticleComment = (req, res) => {
+const updateArticleComment = async (req, res) => {
     const { userId, relatedId, parentCommentId, content } = req.body
-    const updatedComment = ArticleModel.updateArticleComment(commentSchema(
+    const updatedComment = await ArticleModel.updateArticleComment(commentSchema(
         userId, relatedId, parentCommentId, content
     ))
     if (updatedComment) {
@@ -143,9 +143,9 @@ const updateArticleComment = (req, res) => {
 }
 
 // Удаление комментария статьи
-const deleteArticleComment = (req, res) => {
+const deleteArticleComment = async (req, res) => {
     const commentId = req.params.commentId
-    const deletedComment = ArticleModel.deleteArticleComment(commentId)
+    const deletedComment = await ArticleModel.deleteArticleComment(commentId)
     if (deletedComment) {
         res.status(204)
     } else {
@@ -154,9 +154,9 @@ const deleteArticleComment = (req, res) => {
 }
 
 // Получение реакций комментария статьи
-const getArticleCommentReactions = (req, res) => {
+const getArticleCommentReactions = async (req, res) => {
     const commentId = req.params.commentId
-    const commentReactions = ArticleModel.getCommentReactions(commentId)
+    const commentReactions = await ArticleModel.getCommentReactions(commentId)
     if (commentReactions) {
         res.status(200).json(commentReactions)
     } else {
@@ -165,9 +165,9 @@ const getArticleCommentReactions = (req, res) => {
 }
 
 // Добавление реакции на комментарий статьи
-const createArticleCommentReaction = (req, res) => {
+const createArticleCommentReaction = async (req, res) => {
     const { userId, relatedId, content } = req.body
-    const newReaction = ArticleModel.createCommentReaction(reactionSchema(
+    const newReaction = await ArticleModel.createCommentReaction(reactionSchema(
         userId, relatedId, content
     ))
     if (newReaction) {
@@ -180,9 +180,9 @@ const createArticleCommentReaction = (req, res) => {
 }
 
 // Удаление реакции на комментарий статьи
-const deleteArticleCommentReaction = (req, res) => {
+const deleteArticleCommentReaction = async (req, res) => {
     const reactionId = req.params.reactionId
-    const deletedReaction = ArticleModel.deleteCommentReaction(reactionId)
+    const deletedReaction = await ArticleModel.deleteCommentReaction(reactionId)
     if (deletedReaction) {
         res.status(204)
     } else {

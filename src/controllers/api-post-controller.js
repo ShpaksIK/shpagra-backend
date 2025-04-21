@@ -1,15 +1,15 @@
-const PostModel = require('./../models/post')
-const commentSchema = require('../utils/schemes/commentSchema')
-const reactionSchema = require('../utils/schemes/reactionSchema')
-const postSchema = require('./../utils/schemes/postSchema')
+const PostModel = require('../models/post')
+const commentSchema = require('../utils/schemes/comment-schema')
+const reactionSchema = require('../utils/schemes/reaction-schema')
+const postSchema = require('../utils/schemes/post-schema')
 
 
 const authId = 1 // для теста
 
 // Получение постов друзей
-const getFriendsPosts = (req, res) => {
+const getFriendsPosts = async (req, res) => {
     const userId = req.body.userId
-    const friendsPosts = PostModel.getFriendsPosts(userId)
+    const friendsPosts = await PostModel.getFriendsPosts(userId)
     if (friendsPosts) {
         res.status(200).json(friendsPosts)
     } else {
@@ -18,9 +18,9 @@ const getFriendsPosts = (req, res) => {
 }
 
 // Создание поста
-const createPost = (req, res) => {
+const createPost = async (req, res) => {
     const { userId, content } = req.body
-    const newPost = PostModel.createPost(postSchema(
+    const newPost = await PostModel.createPost(postSchema(
         userId, content
     ))
     if (newPost) {
@@ -33,9 +33,9 @@ const createPost = (req, res) => {
 }
 
 // Удаление поста
-const deletePost = (req, res) => {
+const deletePost = async (req, res) => {
     const postId = req.params.postId
-    const deletedPost = PostModel.deletePost(postId)
+    const deletedPost = await PostModel.deletePost(postId)
     if (deletedPost) {
         res.status(204)
     } else {
@@ -44,9 +44,9 @@ const deletePost = (req, res) => {
 }
 
 // Получение реакций поста
-const getPostReactions = (req, res) => {
+const getPostReactions = async (req, res) => {
     const postId = req.params.postId
-    const postReactions = PostModel.getPostReactions(postId)
+    const postReactions = await PostModel.getPostReactions(postId)
     if (postReactions) {
         res.status(200).json(postReactions)
     } else {
@@ -55,9 +55,9 @@ const getPostReactions = (req, res) => {
 }
 
 // Добавление реакции на пост
-const createPostReaction = (req, res) => {
+const createPostReaction = async (req, res) => {
     const { userId, relatedId, content } = req.body
-    const newReaction = PostModel.createPostReaction(reactionSchema(
+    const newReaction = await PostModel.createPostReaction(reactionSchema(
         userId, relatedId, content
     ))
     if (newReaction) {
@@ -70,9 +70,9 @@ const createPostReaction = (req, res) => {
 }
 
 // Удаление реакции поста
-const deletePostReaction = (req, res) => {
+const deletePostReaction = async (req, res) => {
     const reactionId = req.params.reactionId
-    const deletedReaction = PostModel.deletePostReaction(reactionId)
+    const deletedReaction = await PostModel.deletePostReaction(reactionId)
     if (deletedReaction) {
         res.status(204)
     } else {
@@ -81,9 +81,9 @@ const deletePostReaction = (req, res) => {
 }
 
 // Получение комментариев поста
-const getPostComments = (req, res) => {
+const getPostComments = async (req, res) => {
     const postId = req.params.postId
-    const postComments = PostModel.getPostComments(postId)
+    const postComments = await PostModel.getPostComments(postId)
     if (postComments) {
         res.status(200).json(postComments)
     } else {
@@ -92,9 +92,9 @@ const getPostComments = (req, res) => {
 }
 
 // Добавление комментария на пост
-const createPostComment = (req, res) => {
+const createPostComment = async (req, res) => {
     const { userId, relatedId, parentCommentId, content } = req.body
-    const newComment = PostModel.createPostComment(commentSchema(
+    const newComment = await PostModel.createPostComment(commentSchema(
         userId, relatedId, parentCommentId, content
     ))
     if (newComment) {
@@ -107,9 +107,9 @@ const createPostComment = (req, res) => {
 }
 
 // Обновление комментария поста
-const updatePostComment = (req, res) => {
+const updatePostComment = async (req, res) => {
     const { userId, relatedId, parentCommentId, content } = req.body
-    const updatedComment = PostModel.updatePostComment(commentSchema(
+    const updatedComment = await PostModel.updatePostComment(commentSchema(
         userId, relatedId, parentCommentId, content
     ))
     if (updatedComment) {
@@ -120,9 +120,9 @@ const updatePostComment = (req, res) => {
 }
 
 // Удаление комментария поста
-const deletePostComment = (req, res) => {
+const deletePostComment = async (req, res) => {
     const commentId = req.params.commentId
-    const deletedComment = PostModel.deletePostComment(commentId)
+    const deletedComment = await PostModel.deletePostComment(commentId)
     if (deletedComment) {
         res.status(204)
     } else {
@@ -131,9 +131,9 @@ const deletePostComment = (req, res) => {
 }
 
 // Получение реакций комментария поста
-const getPostCommentReactions = (req, res) => {
+const getPostCommentReactions = async (req, res) => {
     const commentId = req.params.commentId
-    const commentReactions = PostModel.getCommentReactions(commentId)
+    const commentReactions = await PostModel.getCommentReactions(commentId)
     if (commentReactions) {
         res.status(200).json(commentReactions)
     } else {
@@ -142,9 +142,9 @@ const getPostCommentReactions = (req, res) => {
 }
 
 // Добавление реакции на комментарий поста
-const createPostCommentReaction = (req, res) => {
+const createPostCommentReaction = async (req, res) => {
     const { userId, relatedId, content } = req.body
-    const newReaction = PostModel.createCommentReaction(reactionSchema(
+    const newReaction = await PostModel.createCommentReaction(reactionSchema(
         userId, relatedId, content
     ))
     if (newReaction) {
@@ -157,9 +157,9 @@ const createPostCommentReaction = (req, res) => {
 }
 
 // Удаление реакции на комментарий поста
-const deletePostCommentReaction = (req, res) => {
+const deletePostCommentReaction = async (req, res) => {
     const reactionId = req.params.reactionId
-    const deletedReaction = PostModel.deleteCommentReaction(reactionId)
+    const deletedReaction = await PostModel.deleteCommentReaction(reactionId)
     if (deletedReaction) {
         res.status(204)
     } else {

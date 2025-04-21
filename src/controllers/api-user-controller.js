@@ -1,14 +1,14 @@
 const UserModel = require('./../models/user')
-const userSchema = require('../utils/schemes/userSchema')
-const notificationSchema = require('../utils/schemes/notificationSchema')
-const subscriptionSchema = require('../utils/schemes/subscriptionSchema')
+const userSchema = require('../utils/schemes/user-schema')
+const notificationSchema = require('../utils/schemes/notification-schema')
+const subscriptionSchema = require('../utils/schemes/subscription-schema')
 
 
 const authId = 1 // для теста
 
 // Получение пользователей
-const getUsers = (req, res) => {
-    const users = UserModel.getUsers()
+const getUsers = async (req, res) => {
+    const users = await UserModel.getUsers()
     if (users) {
         res.status(200).json(users)
     } else {
@@ -17,8 +17,8 @@ const getUsers = (req, res) => {
 }
 
 // Получение пользователя
-const getUser = (req, res) => {
-    const userId = req.params.userId
+const getUser = async (req, res) => {
+    const userId = await req.params.userId
     const user = UserModel.getUser(userId)
     if (user) {
         res.status(200).json(user)
@@ -28,9 +28,9 @@ const getUser = (req, res) => {
 }
 
 // Добавление пользователя
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
     const { login, username, passwordHash } = req.body
-    const newUser = UserModel.createUser(userSchema(
+    const newUser = await UserModel.createUser(userSchema(
         login, username, passwordHash
     ))
     if (newUser) {
@@ -43,9 +43,9 @@ const createUser = (req, res) => {
 }
 
 // Обновление пользователя
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
     const { login, username, passwordHash, email } = req.body
-    const updatedUser = UserModel.updateUser(userSchema(
+    const updatedUser = await UserModel.updateUser(userSchema(
         login, username, passwordHash, email
     ))
     if (updatedUser) {
@@ -56,9 +56,9 @@ const updateUser = (req, res) => {
 }
 
 // Удаление пользователя
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
     const userId = req.params.userId
-    const deletedUser = UserModel.deleteUser(userId)
+    const deletedUser = await UserModel.deleteUser(userId)
     if (deletedUser) {
         res.status(204)
     } else {
@@ -67,9 +67,9 @@ const deleteUser = (req, res) => {
 }
 
 // Получение всех статей пользователя
-const getUserArticles = (req, res) => {
+const getUserArticles = async (req, res) => {
     const userId = req.params.userId
-    const userArticles = UserModel.getUserArticles(userId)
+    const userArticles = await UserModel.getUserArticles(userId)
     if (userArticles) {
         res.status(200).json(userArticles)
     } else {
@@ -78,9 +78,9 @@ const getUserArticles = (req, res) => {
 }
 
 // Получение всех постов пользователя
-const getUserPosts = (req, res) => {
+const getUserPosts = async (req, res) => {
     const userId = req.params.userId
-    const userPosts = UserModel.getUserPosts(userId)
+    const userPosts = await UserModel.getUserPosts(userId)
     if (userPosts) {
         res.status(200).json(userPosts)
     } else {
@@ -89,9 +89,9 @@ const getUserPosts = (req, res) => {
 }
 
 // Получение всех уведомлений пользователя
-const getUserNotifications = (req, res) => {
+const getUserNotifications = async (req, res) => {
     const userId = req.params.userId
-    const userNotifications = UserModel.getUserNotifications(userId)
+    const userNotifications = await UserModel.getUserNotifications(userId)
     if (userNotifications) {
         res.status(200).json(userNotifications)
     } else {
@@ -100,9 +100,9 @@ const getUserNotifications = (req, res) => {
 }
 
 // Создание уведомления пользователя
-const createUserNotifications = (req, res) => {
+const createUserNotifications = async (req, res) => {
     const { userId, relatedId, type, content } = req.body
-    const newNotifications = UserModel.createUserNotifications(notificationSchema(
+    const newNotifications = await UserModel.createUserNotifications(notificationSchema(
         userId, relatedId, type, content
     ))
     if (newNotifications) {
@@ -115,9 +115,9 @@ const createUserNotifications = (req, res) => {
 }
 
 // Получение всех подписчиков пользователя
-const getUserFollowers = (req, res) => {
+const getUserFollowers = async (req, res) => {
     const userId = req.params.userId
-    const userFollowers = UserModel.getUserFollowers(userId)
+    const userFollowers = await UserModel.getUserFollowers(userId)
     if (userFollowers) {
         res.status(200).json(userFollowers)
     } else {
@@ -126,9 +126,9 @@ const getUserFollowers = (req, res) => {
 }
 
 // Получение всех подписок пользователя
-const getUserFolloweds = (req, res) => {
+const getUserFolloweds = async (req, res) => {
     const userId = req.params.userId
-    const userFolloweds = UserModel.getUserFolloweds(userId)
+    const userFolloweds = await UserModel.getUserFolloweds(userId)
     if (userFolloweds) {
         res.status(200).json(userFolloweds)
     } else {
@@ -137,9 +137,9 @@ const getUserFolloweds = (req, res) => {
 }
 
 // Создание подписки пользователя на другого
-const followToUser = (req, res) => {
+const followToUser = async (req, res) => {
     const { userId, followedId } = req.body
-    const newFollow = UserModel.followToUser(subscriptionSchema(
+    const newFollow = await UserModel.followToUser(subscriptionSchema(
         userId, followedId
     ))
     if (newFollow) {
@@ -152,9 +152,9 @@ const followToUser = (req, res) => {
 }
 
 // Удаление подписки пользователя на другого
-const unfollowToUser = (req, res) => {
+const unfollowToUser = async (req, res) => {
     const subscriptionId = req.params.subscriptionId
-    const deletedFollow = UserModel.unfollowToUser(subscriptionId)
+    const deletedFollow = await UserModel.unfollowToUser(subscriptionId)
     if (deletedFollow) {
         res.status(204)
     } else {
