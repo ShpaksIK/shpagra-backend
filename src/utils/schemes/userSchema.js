@@ -1,9 +1,9 @@
-const userSchema = (login, passwordHash, email) => {
+const userSchema = (login, username, passwordHash) => {
     return {
         login,
-        customId: null,
+        username,
         passwordHash,
-        email,
+        email: null,
         updatedAt: null
     }
 }

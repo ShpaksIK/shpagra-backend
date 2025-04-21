@@ -1,4 +1,4 @@
-const commentSchema = (userId, relatedId, parentCommentId = null, content) => {
+const commentSchema = (userId, relatedId, parentCommentId, content) => {
     return {
         userId,
         relatedId,

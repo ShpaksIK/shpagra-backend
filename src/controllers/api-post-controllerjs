@@ -1,0 +1,185 @@
+const PostModel = require('./../models/post')
+const commentSchema = require('../utils/schemes/commentSchema')
+const reactionSchema = require('../utils/schemes/reactionSchema')
+const postSchema = require('./../utils/schemes/postSchema')
+
+
+const authId = 1 // для теста
+
+// Получение постов друзей
+const getFriendsPosts = (req, res) => {
+    const userId = req.body.userId
+    const friendsPosts = PostModel.getFriendsPosts(userId)
+    if (friendsPosts) {
+        res.status(200).json(friendsPosts)
+    } else {
+        res.status(404)
+    }
+}
+
+// Создание поста
+const createPost = (req, res) => {
+    const { userId, content } = req.body
+    const newPost = PostModel.createPost(postSchema(
+        userId, content
+    ))
+    if (newPost) {
+        res.status(201).json({
+            postId: newPost.post_id
+        })
+    } else {
+        res.status(400)
+    }
+}
+
+// Удаление поста
+const deletePost = (req, res) => {
+    const postId = req.params.postId
+    const deletedPost = PostModel.deletePost(postId)
+    if (deletedPost) {
+        res.status(204)
+    } else {
+        res.status(404)
+    }
+}
+
+// Получение реакций поста
+const getPostReactions = (req, res) => {
+    const postId = req.params.postId
+    const postReactions = PostModel.getPostReactions(postId)
+    if (postReactions) {
+        res.status(200).json(postReactions)
+    } else {
+        res.status(404)
+    }
+}
+
+// Добавление реакции на пост
+const createPostReaction = (req, res) => {
+    const { userId, relatedId, content } = req.body
+    const newReaction = PostModel.createPostReaction(reactionSchema(
+        userId, relatedId, content
+    ))
+    if (newReaction) {
+        res.status(201).json({
+            reactionId: newReaction.reactionId
+        })
+    } else {
+        res.status(400)
+    }
+}
+
+// Удаление реакции поста
+const deletePostReaction = (req, res) => {
+    const reactionId = req.params.reactionId
+    const deletedReaction = PostModel.deletePostReaction(reactionId)
+    if (deletedReaction) {
+        res.status(204)
+    } else {
+        res.status(404)
+    }
+}
+
+// Получение комментариев поста
+const getPostComments = (req, res) => {
+    const postId = req.params.postId
+    const postComments = PostModel.getPostComments(postId)
+    if (postComments) {
+        res.status(200).json(postComments)
+    } else {
+        res.status(404)
+    }
+}
+
+// Добавление комментария на пост
+const createPostComment = (req, res) => {
+    const { userId, relatedId, parentCommentId, content } = req.body
+    const newComment = PostModel.createPostComment(commentSchema(
+        userId, relatedId, parentCommentId, content
+    ))
+    if (newComment) {
+        res.status(201).json({
+            commentId: newComment.commentId
+        })
+    } else {
+        res.status(400)
+    }
+}
+
+// Обновление комментария поста
+const updatePostComment = (req, res) => {
+    const { userId, relatedId, parentCommentId, content } = req.body
+    const updatedComment = PostModel.updatePostComment(commentSchema(
+        userId, relatedId, parentCommentId, content
+    ))
+    if (updatedComment) {
+        res.status(200)
+    } else {
+        res.status(400)
+    }
+}
+
+// Удаление комментария поста
+const deletePostComment = (req, res) => {
+    const commentId = req.params.commentId
+    const deletedComment = PostModel.deletePostComment(commentId)
+    if (deletedComment) {
+        res.status(204)
+    } else {
+        res.status(404)
+    }
+}
+
+// Получение реакций комментария поста
+const getPostCommentReactions = (req, res) => {
+    const commentId = req.params.commentId
+    const commentReactions = PostModel.getCommentReactions(commentId)
+    if (commentReactions) {
+        res.status(200).json(commentReactions)
+    } else {
+        res.status(404)
+    }
+}
+
+// Добавление реакции на комментарий поста
+const createPostCommentReaction = (req, res) => {
+    const { userId, relatedId, content } = req.body
+    const newReaction = PostModel.createCommentReaction(reactionSchema(
+        userId, relatedId, content
+    ))
+    if (newReaction) {
+        res.status(201).json({
+            reactionId: newReaction.reactionId
+        })
+    } else {
+        res.status(400)
+    }
+}
+
+// Удаление реакции на комментарий поста
+const deletePostCommentReaction = (req, res) => {
+    const reactionId = req.params.reactionId
+    const deletedReaction = PostModel.deleteCommentReaction(reactionId)
+    if (deletedReaction) {
+        res.status(204)
+    } else {
+        res.status(404)
+    }
+}
+
+
+module.exports = {
+    getFriendsPosts,
+    createPost,
+    deletePost,
+    getPostReactions,
+    createPostReaction,
+    deletePostReaction,
+    getPostComments,
+    createPostComment,
+    updatePostComment,
+    deletePostComment,
+    getPostCommentReactions,
+    createPostCommentReaction,
+    deletePostCommentReaction
+}
