@@ -1,9 +1,9 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const publicRoute = require('./routes/api-public-routes')
-const userRoute = require('./routes/api-user-routes')
-const articleRoute = require('./routes/api-article-routes')
+const usersRoute = require('./routes/api-users-routes')
+const articlesRoute = require('./routes/api-articles-routes')
+const postsRoute = require('./routes/api-posts-routes')
 require('dotenv').config()
 
 
@@ -17,9 +17,9 @@ app.use(cors({
 }))
 app.use(bodyParser.json())
 
-app.use('/api', publicRoute)
-app.use('/api', userRoute)
-app.use('/api', articleRoute)
+app.use('/api', usersRoute)
+app.use('/api', articlesRoute)
+app.use('/api', postsRoute)
 
 app.listen(PORT, (error) => {
     error ? console.log(error) : console.log(`listening port ${PORT}`)
