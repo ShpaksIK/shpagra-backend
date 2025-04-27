@@ -8,69 +8,43 @@ const router = express.Router()
 
 
 // Получение постов друзей пользователя
-router.post('/posts', (req, res) => {
-    getFriendsPosts(req, res)
-})
+router.post('/posts', getFriendsPosts)
 
 // Создание поста
-router.post('/posts', (req, res) => {
-    createPost(req, res)
-})
+router.post('/posts', createPost)
 
 // Удаление поста
-router.delete('/posts/:postId', (req, res) => {
-    deletePost(req, res)
-})
+router.delete('/posts/:postId', deletePost)
 
 // Получение реакций поста
-router.get('/posts/:postId/reactions', (req, res) => {
-    getPostReactions(req, res)
-})
+router.get('/posts/:postId/reactions', getPostReactions)
 
 // Добавление реакции на пост
-router.post('/posts/:postId/reactions', (req, res) => {
-    createPostReaction(req, res)
-})
+router.post('/posts/:postId/reactions', createPostReaction)
 
 // Удаление реакции поста
-router.delete('/posts/:postId/reactions/:reactionId', (req, res) => {
-    deletePostReaction(req, res)
-})
+router.delete('/posts/:postId/reactions/:reactionId', deletePostReaction)
 
 // Получение комментариев поста
-router.get('/posts/:postId/comments', (req, res) => {
-    getPostComments(req, res)
-})
+router.get('/posts/:postId/comments', getPostComments)
 
 // Добавление комментария на пост
-router.post('/posts/:postId/comments', (req, res) => {
-    createPostComment(req, res)
-})
+router.post('/posts/:postId/comments', createPostComment)
 
 // Удаление комментария поста
-router.delete('/posts/:postId/comments/:commentId', (req, res) => {
-    deletePostComment(req, res)
-})
+router.delete('/posts/:postId/comments/:commentId', deletePostComment)
 
 // Изменение комментария поста
-router.put('/posts/:postId/comments/:commentId', (req, res) => {
-    updatePostComment(req, res)
-})
+router.put('/posts/:postId/comments/:commentId', updatePostComment)
 
 // Получение реакций на комментарий поста
-router.get('/posts/:postId/comments/:commentId/reactions', (req, res) => {
-    getPostCommentReactions(req, res)
-})
+router.get('/posts/:postId/comments/:commentId/reactions', getPostCommentReactions)
 
 // Добавление реакции на комментарий поста
-router.post('/posts/:postId/comments/:commentId/reactions', (req, res) => {
-    createPostCommentReaction(req, res)
-})
+router.post('/posts/:postId/comments/:commentId/reactions', createPostCommentReaction)
 
 // Удаление реакции на комментарий поста
-router.delete('/posts/:postId/comments/:commentId/reactions/:reactionId', (req, res) => {
-    deletePostCommentReaction(req, res)
-})
+router.delete('/posts/:postId/comments/:commentId/reactions/:reactionId', deletePostCommentReaction)
 
 
 module.exports = router

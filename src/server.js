@@ -1,6 +1,5 @@
 const express = require('express')
 const cors = require('cors')
-const bodyParser = require('body-parser')
 const usersRoute = require('./routes/api-users-routes')
 const articlesRoute = require('./routes/api-articles-routes')
 const postsRoute = require('./routes/api-posts-routes')
@@ -13,9 +12,9 @@ const PORT = process.env.PORT || 5000
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
+    credentials: false,
 }))
-app.use(bodyParser.json())
+app.use(express.json())
 
 app.use('/api', usersRoute)
 app.use('/api', articlesRoute)

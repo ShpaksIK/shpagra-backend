@@ -4,8 +4,6 @@ const notificationSchema = require('../utils/schemes/notification-schema')
 const subscriptionSchema = require('../utils/schemes/subscription-schema')
 
 
-const authId = 1 // для теста
-
 // Получение пользователей
 const getUsers = async (req, res) => {
     const users = await UserModel.getUsers()
@@ -18,8 +16,8 @@ const getUsers = async (req, res) => {
 
 // Получение пользователя
 const getUser = async (req, res) => {
-    const userId = await req.params.userId
-    const user = UserModel.getUser(userId)
+    const userId = req.params.userId
+    const user = await UserModel.getUser(userId)
     if (user) {
         res.status(200).json(user)
     } else {
@@ -44,10 +42,11 @@ const createUser = async (req, res) => {
 
 // Обновление пользователя
 const updateUser = async (req, res) => {
+    const userId = req.params.userId
     const { login, username, passwordHash, email } = req.body
     const updatedUser = await UserModel.updateUser(userSchema(
         login, username, passwordHash, email
-    ))
+    ), userId)
     if (updatedUser) {
         res.status(200)
     } else {

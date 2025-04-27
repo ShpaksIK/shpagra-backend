@@ -4,8 +4,6 @@ const reactionSchema = require('../utils/schemes/reaction-schema')
 const articleSchema = require('../utils/schemes/article-schema')
 
 
-const authId = 1 // для теста
-
 // Получение превью рекомендуемых статей
 const getRecommendedArticlesPreview = async (req, res) => {
     const recommendedArticlesPreview = await ArticleModel.getArticles()

@@ -10,79 +10,49 @@ const router = express.Router()
 
 
 // Получение статей
-router.get('/articles', (req, res) => {
-    getRecommendedArticlesPreview(req, res)
-})
+router.get('/articles', getRecommendedArticlesPreview)
 
 // Получение статьи
-router.get('/articles/:articleId', (req, res) => {
-    getArticle(req, res)
-})
+router.get('/articles/:articleId', getArticle)
 
 // Создание статьи
-router.post('/articles', (req, res) => {
-    createArticle(req, res)
-})
+router.post('/articles', createArticle)
 
 // Удаление статьи
-router.delete('/articles/:articleId', (req, res) => {
-    deleteArticle(req, res)
-})
+router.delete('/articles/:articleId', deleteArticle)
 
 // Изменение статьи
-router.put('/articles/:articleId', (req, res) => {
-    updateArticle(req, res)
-})
+router.put('/articles/:articleId', updateArticle)
 
 // Получение реакций статьи
-router.get('/articles/:articleId/reactions', (req, res) => {
-    getArticleReactions(req, res)
-})
+router.get('/articles/:articleId/reactions', getArticleReactions)
 
 // Добавление реакции на статью
-router.post('/articles/:articleId/reactions', (req, res) => {
-    createArticleReaction(req, res)
-})
+router.post('/articles/:articleId/reactions', createArticleReaction)
 
 // Удаление реакции статьи
-router.delete('/articles/:articleId/reactions/:reactionId', (req, res) => {
-    deleteArticleReaction(req, res)
-})
+router.delete('/articles/:articleId/reactions/:reactionId', deleteArticleReaction)
 
 // Получение комментариев статьи
-router.get('/articles/:articleId/comments', (req, res) => {
-    getArticleComments(req, res)
-})
+router.get('/articles/:articleId/comments', getArticleComments)
 
 // Добавление комментария на статью
-router.post('/articles/:articleId/comments', (req, res) => {
-    createArticleComment(req, res)
-})
+router.post('/articles/:articleId/comments', createArticleComment)
 
 // Удаление комментария статьи
-router.delete('/articles/:articleId/comments/:commentId', (req, res) => {
-    deleteArticleComment(req, res)
-})
+router.delete('/articles/:articleId/comments/:commentId', deleteArticleComment)
 
 // Изменение комментария статьи
-router.put('/articles/:articleId/comments/:commentId', (req, res) => {
-    updateArticleComment(req, res)
-})
+router.put('/articles/:articleId/comments/:commentId', updateArticleComment)
 
 // Получение реакций на комментарий статьи
-router.get('/articles/:articleId/comments/:commentId/reactions', (req, res) => {
-    getArticleCommentReactions(req, res)
-})
+router.get('/articles/:articleId/comments/:commentId/reactions', getArticleCommentReactions)
 
 // Добавление реакции на комментарий статьи
-router.post('/articles/:articleId/comments/:commentId/reactions', (req, res) => {
-    createArticleCommentReaction(req, res)
-})
+router.post('/articles/:articleId/comments/:commentId/reactions', createArticleCommentReaction)
 
 // Удаление реакции на комментарий статьи
-router.delete('/articles/:articleId/comments/:commentId/reactions/:reactionId', (req, res) => {
-    deleteArticleCommentReaction(req, res)
-})
+router.delete('/articles/:articleId/comments/:commentId/reactions/:reactionId', deleteArticleCommentReaction)
 
 
 module.exports = router

@@ -2,64 +2,44 @@ const express = require('express')
 const { getUsers, getUser, updateUser, getUserFollowers, 
     getUserFolloweds, followToUser, unfollowToUser, 
     getUserPosts, getUserArticles, getUserNotifications, 
-    createUserNotifications } = require('../controllers/api-user-controller')
+    createUserNotifications, createUser } = require('../controllers/api-user-controller')
 const router = express.Router()
 
 
 // Получение пользователей
-router.get('/users', (req, res) => {
-    getUsers(req, res)
-}) 
+router.get('/users', getUsers) 
+
+router.post('/users', createUser) 
 
 // Получение профиля пользователя
-router.get('/users/:userId', (req, res) => {
-    getUser(req, res)
-})
+router.get('/users/:userId', getUser)
 
 // Изменение профиля пользователя
-router.put('/users/:userId', (req, res) => {
-    updateUser(req, res)
-})
+router.put('/users/:userId', updateUser)
 
 // Получение подписчиков пользователя
-router.get('/users/:userId/friends', (req, res) => {
-    getUserFollowers(req, res)
-})
+router.get('/users/:userId/friends', getUserFollowers)
 
 // Получение подписок пользователя
-router.get('/users/:userId/followeds', (req, res) => {
-    getUserFolloweds(req, res)
-})
+router.get('/users/:userId/followeds', getUserFolloweds)
 
 // Подписка на пользователя
-router.post('/users/:userId/friends', (req, res) => {
-    followToUser(req, res)
-})
+router.post('/users/:userId/friends', followToUser)
 
 // Отписка от пользователя
-router.delete('/users/:userId/friends/:friendId', (req, res) => {
-    unfollowToUser(req, res)
-})
+router.delete('/users/:userId/friends/:friendId', unfollowToUser)
 
 // Получение постов пользователя
-router.get('/users/:userId/posts', (req, res) => {
-    getUserPosts(req, res)
-})
+router.get('/users/:userId/posts', getUserPosts)
 
 // Получение статей пользователя
-router.get('/users/:userId/articles', (req, res) => {
-    getUserArticles(req, res)
-})
+router.get('/users/:userId/articles', getUserArticles)
 
 // Получение всех уведомлений пользователя
-router.get('/users/:userId/articles', (req, res) => {
-    getUserNotifications(req, res)
-})
+router.get('/users/:userId/articles', getUserNotifications)
 
 // Создание уведомления пользователя
-router.get('/users/:userId/articles', (req, res) => {
-    createUserNotifications(req, res)
-})
+router.get('/users/:userId/articles', createUserNotifications)
 
 
 module.exports = router

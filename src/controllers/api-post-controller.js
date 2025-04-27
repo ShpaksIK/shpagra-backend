@@ -4,8 +4,6 @@ const reactionSchema = require('../utils/schemes/reaction-schema')
 const postSchema = require('../utils/schemes/post-schema')
 
 
-const authId = 1 // для теста
-
 // Получение постов друзей
 const getFriendsPosts = async (req, res) => {
     const userId = req.body.userId
