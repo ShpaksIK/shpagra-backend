@@ -1,14 +1,16 @@
 const express = require('express')
-const { getUsers, getUser, updateUser, getUserFollowers, 
-    getUserFolloweds, followToUser, unfollowToUser, 
-    getUserPosts, getUserArticles, getUserNotifications, 
-    createUserNotifications, createUser } = require('../controllers/api-user-controller')
+const { getUsers, getUser, updateUser, updateUserPassword,
+    getUserFollowers, getUserFolloweds, followToUser, 
+    unfollowToUser, getUserPosts, getUserArticles, 
+    getUserNotifications, createUserNotifications, 
+    createUser } = require('../controllers/api-user-controller')
 const router = express.Router()
 
 
 // Получение пользователей
 router.get('/users', getUsers) 
 
+// Создание пользователя
 router.post('/users', createUser) 
 
 // Получение профиля пользователя
@@ -16,6 +18,9 @@ router.get('/users/:userId', getUser)
 
 // Изменение профиля пользователя
 router.put('/users/:userId', updateUser)
+
+// Изменение пароля пользователя
+router.put('/users/:userId/change-password', updateUserPassword)
 
 // Получение подписчиков пользователя
 router.get('/users/:userId/friends', getUserFollowers)
@@ -36,10 +41,10 @@ router.get('/users/:userId/posts', getUserPosts)
 router.get('/users/:userId/articles', getUserArticles)
 
 // Получение всех уведомлений пользователя
-router.get('/users/:userId/articles', getUserNotifications)
+router.get('/users/:userId/notifications', getUserNotifications)
 
 // Создание уведомления пользователя
-router.get('/users/:userId/articles', createUserNotifications)
+router.post('/users/:userId/notifications', createUserNotifications)
 
 
 module.exports = router

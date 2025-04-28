@@ -3,8 +3,7 @@ const notificationSchema = (userId, relatedId, type, content) => {
         userId,
         relatedId,
         type,
-        content,
-        isRead: false,
+        content
     }
 }
 

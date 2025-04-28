@@ -1,12 +1,11 @@
-const articleSchema = (userId, title, description, banner, content) => {
+const articleSchema = (userId, title, description, banner, content, status) => {
     return {
         userId,
         title,
         description,
         banner,
         content,
-        status: 'review',
-        updatedAt: null
+        status
     }
 }
 

@@ -5,14 +5,14 @@ class UserModel {
     // Получение пользователей в заданном количестве
     async getUsers() {
         const receiptLimit = 10;
-        const users = await db.query('SELECT * FROM "user" LIMIT $1', [receiptLimit])
+        const users = await db.query('SELECT user_id, username, created_at FROM "user" LIMIT $1', [receiptLimit])
         return users.rows
     }
 
     // Получение пользователя
     async getUser(userId) {
         const user = await db.query(
-            'SELECT * FROM "user" WHERE user_id = $1',
+            'SELECT user_id, username, created_at FROM "user" WHERE user_id = $1',
             [userId]
         )
         return user.rows[0]
@@ -30,8 +30,17 @@ class UserModel {
     // Обновление пользователя
     async updateUser(user, userId) {
         const updatedUser = await db.query(
-            'UPDATE "user" SET login = $1, username = $2, password_hash = $3, email = $4, updated_at = CURRENT_DATE WHERE user_id = $5 RETURNING *',
-            [user.login, user.username, user.passwordHash, user.email, userId]
+            'UPDATE "user" SET login = $1, username = $2, email = $3, updated_at = CURRENT_DATE WHERE user_id = $4 RETURNING *',
+            [user.login, user.username, user.email, userId]
+        )
+        return updatedUser.rows[0]
+    }
+
+    // Обновление пароля пользователя
+    async updateUserPassword(newPassword, userId) {
+        const updatedUser = await db.query(
+            'UPDATE "user" SET password_hash = $1, updated_at = CURRENT_DATE WHERE user_id = $2 RETURNING *',
+            [newPassword, userId]
         )
         return updatedUser.rows[0]
     }
@@ -93,7 +102,7 @@ class UserModel {
     // Получение всех подписок пользователя
     async getUserFolloweds(userId) {
         const userFolloweds = await db.query(
-            'SELECT u.* FROM subscription s JOIN "user" u ON s.followed_id = u.user_id WHERE s.follower_id = $1',
+            'SELECT u.user_id, u.username, u.created_at FROM subscription s JOIN "user" u ON s.followed_id = u.user_id WHERE s.follower_id = $1',
             [userId]
         )
         return userFolloweds.rows
