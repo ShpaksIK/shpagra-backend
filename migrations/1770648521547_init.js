@@ -55,6 +55,24 @@ id_profile INTEGER NOT NULL REFERENCES Profile(id),
 type_entity VARCHAR(50) NOT NULL,
 id_entity INTEGER NOT NULL,
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Profile_settings (
+id SERIAL PRIMARY KEY,
+is_visible_articles BOOLEAN NOT NULL DEFAULT TRUE,
+is_visible_comments BOOLEAN NOT NULL DEFAULT TRUE,
+is_visible_reactions BOOLEAN NOT NULL DEFAULT TRUE,
+id_profile INTEGER UNIQUE NOT NULL REFERENCES Profile(id)
+);
+
+CREATE TABLE Sessions (
+id SERIAL PRIMARY KEY,
+profile_id INTEGER REFERENCES profile(id) ON DELETE CASCADE,
+refresh_token VARCHAR(500) NOT NULL,
+user_agent TEXT,
+ip_address VARCHAR(45),
+expires_at TIMESTAMP NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );`);
 };
 
@@ -69,5 +87,7 @@ DROP TABLE Article;
 DROP TABLE Article_Status;
 DROP TABLE Comment;
 DROP TABLE Reaction;
+DROP TABLE Sessions;
+DROP TABLE Profile_settings;
 DROP TABLE Profile;`);
 };
