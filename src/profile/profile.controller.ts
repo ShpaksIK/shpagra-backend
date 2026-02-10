@@ -1,7 +1,10 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Put,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -9,6 +12,7 @@ import {
 import { ProfileService } from './profile.service';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UpdateProfileFullDto } from './dto/profile.dto';
 
 @Controller('api/profiles')
 export class ProfileController {
@@ -46,5 +50,33 @@ export class ProfileController {
   @Get('/:profileLogin/reactions')
   async getReactionsByLogin(@Param('profileLogin') login: string) {
     return await this.profileService.getReactionsByLogin(login);
+  }
+
+  @Put()
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(@Body() dto: UpdateProfileFullDto, @Req() req: Request) {
+    const user = req.user;
+
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+
+    const profileId = user['profileId'];
+
+    return await this.profileService.updateProfile(profileId, dto);
+  }
+
+  @Delete()
+  @UseGuards(JwtAuthGuard)
+  async deleteProfile(@Req() req: Request) {
+    const user = req.user;
+
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+
+    const profileId = user['profileId'];
+
+    return await this.profileService.deleteProfile(profileId);
   }
 }

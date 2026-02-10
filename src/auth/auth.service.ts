@@ -53,7 +53,7 @@ export class AuthService {
 
   async login(dto: LoginDto, userAgent?: string, ip?: string): Promise<Tokens> {
     const result = await this.databaseService.query(
-      'SELECT id, login, password FROM profile WHERE login = $1',
+      'SELECT id, login, password FROM profile WHERE login = $1 AND deleted_at IS NULL',
       [dto.login],
     );
 
