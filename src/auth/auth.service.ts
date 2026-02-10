@@ -20,12 +20,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async getMe() {
-    return this.databaseService.query(
-      'SELECT id, login, username, created_at WHERE login',
-    );
-  }
-
   async register(dto: RegisterDto) {
     const existingUser = await this.databaseService.query(
       'SELECT id FROM profile WHERE login = $1',
@@ -40,10 +34,21 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    await this.databaseService.query(
-      'INSERT INTO profile (login, password, username) VALUES ($1, $2, $3)',
-      [dto.login, hashedPassword, dto.username],
-    );
+    await this.databaseService.transaction(async (client) => {
+      const profileResult = await client.query(
+        `INSERT INTO profile (login, password, username)
+        VALUES ($1, $2, $3)
+        RETURNING id`,
+        [dto.login, hashedPassword, dto.username],
+      );
+
+      const profileId = profileResult.rows[0].id;
+
+      await client.query(
+        'INSERT INTO profile_settings (id_profile) VALUES ($1)',
+        [profileId],
+      );
+    });
   }
 
   async login(dto: LoginDto, userAgent?: string, ip?: string): Promise<Tokens> {

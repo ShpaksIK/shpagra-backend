@@ -10,7 +10,12 @@ export class ProfileService {
 
   async getByLogin(login: string) {
     const result = await this.databaseService.query(
-      'SELECT id, login, username, created_at FROM profile WHERE login = $1',
+      `SELECT p.id, p.login, p.username, p.created_at,
+        ps.is_visible_articles, ps.is_visible_comments,
+        ps.is_visible_reactions
+      FROM profile p
+      JOIN profile_settings ps ON p.id = ps.id_profile
+      WHERE p.login = $1`,
       [login],
     );
 
