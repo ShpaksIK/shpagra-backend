@@ -26,6 +26,7 @@ content TEXT NOT NULL,
 id_profile INTEGER NOT NULL REFERENCES Profile(id),
 type_entity VARCHAR(50) NOT NULL,
 id_entity INTEGER NOT NULL,
+id_parent INTEGER REFERENCES Comment(id),
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 updated_at  TIMESTAMPTZ,
 deleted_at TIMESTAMPTZ
@@ -79,7 +80,6 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 export const down = (pgm) => {
     pgm.sql(`
 DROP TABLE Article;
-DROP TABLE Article_Status;
 DROP TABLE Comment;
 DROP TABLE Reaction;
 DROP TABLE Sessions;
