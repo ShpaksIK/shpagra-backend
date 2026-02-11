@@ -155,4 +155,39 @@ export class ArticleService {
 
     return reactions.rows;
   }
+
+  async createReaction(
+    articleId: number,
+    profileId: number,
+    dto: CreateReactionDto,
+  ) {
+    return this.databaseService.transaction(async (client) => {
+      const reactionExists = await client.query(
+        `SELECT id FROM reaction WHERE id_profile = $1 AND type_entity = 'article'`,
+        [profileId],
+      );
+      const reaction = reactionExists.rows[0];
+
+      if (reaction) {
+        await client.query(`DELETE FROM reaction WHERE id = $1`, [reaction.id]);
+      }
+
+      await this.databaseService.query(
+        `INSERT INTO reaction (content, id_profile, type_entity, id_entity)
+              VALUES ($1, $2, 'article', $3)`,
+        [dto.content, profileId, articleId],
+      );
+    });
+  }
+
+  async deleteReaction(reactionId: number, profileId: number) {
+    const reaction = await this.databaseService.query(
+      `DELETE FROM reaction WHERE id = $1 AND id_profile = $2 RETURNING id`,
+      [reactionId, profileId],
+    );
+
+    if (!reaction.rows[0]) {
+      throw new NotFoundException('Реакция не найдена');
+    }
+  }
 }

@@ -16,6 +16,7 @@ import { CreateArticleDto, UpdateArticleDto } from './dto/article.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { Request } from 'express';
 import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
+import { CreateReactionDto } from './dto/reaction.dto';
 
 @Controller('api/articles')
 export class ArticleController {
@@ -124,5 +125,36 @@ export class ArticleController {
   @Get('/:articleId/reactions')
   async getReactions(@Param('articleId', ParseIntPipe) articleId: number) {
     return await this.articleService.getReactions(articleId);
+  }
+
+  @Post('/:articleId/reactions')
+  @UseGuards(JwtAuthGuard)
+  async createReaction(
+    @Param('articleId', ParseIntPipe) articleId: number,
+    @Body() dto: CreateReactionDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+    const profileId = user['profileId'];
+
+    return await this.articleService.createReaction(articleId, profileId, dto);
+  }
+
+  @Delete('/:articleId/reactions/:reactionId')
+  @UseGuards(JwtAuthGuard)
+  async deleteReaction(
+    @Param('reactionId', ParseIntPipe) reactionId: number,
+    @Req() req: Request,
+  ) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+    const profileId = user['profileId'];
+
+    return await this.articleService.deleteReaction(reactionId, profileId);
   }
 }
