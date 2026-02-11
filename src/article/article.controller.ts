@@ -157,4 +157,46 @@ export class ArticleController {
 
     return await this.articleService.deleteReaction(reactionId, profileId);
   }
+
+  @Get('/:articleId/comments/:commentId/reactions')
+  async getCommentReactions(
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ) {
+    return await this.articleService.getCommentReactions(commentId);
+  }
+
+  @Post('/:articleId/comments/:commentId/reactions')
+  @UseGuards(JwtAuthGuard)
+  async createCommentReaction(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Body() dto: CreateReactionDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+    const profileId = user['profileId'];
+
+    return await this.articleService.createCommentReaction(
+      commentId,
+      profileId,
+      dto,
+    );
+  }
+
+  @Delete('/:articleId/comments/:commentId/reactions/:reactionId')
+  @UseGuards(JwtAuthGuard)
+  async deleteCommentReaction(
+    @Param('reactionId', ParseIntPipe) reactionId: number,
+    @Req() req: Request,
+  ) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+    const profileId = user['profileId'];
+
+    return await this.articleService.deleteReaction(reactionId, profileId);
+  }
 }

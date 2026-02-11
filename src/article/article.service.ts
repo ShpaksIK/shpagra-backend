@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.provider';
 import { CreateArticleDto, UpdateArticleDto } from './dto/article.dto';
 import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
@@ -189,5 +184,39 @@ export class ArticleService {
     if (!reaction.rows[0]) {
       throw new NotFoundException('Реакция не найдена');
     }
+  }
+
+  async getCommentReactions(commentId: number) {
+    const reactions = await this.databaseService.query(
+      `SELECT id, content FROM reaction 
+      WHERE id_entity = $1 AND type_entity = 'comment'`,
+      [commentId],
+    );
+
+    return reactions.rows;
+  }
+
+  async createCommentReaction(
+    commentId: number,
+    profileId: number,
+    dto: CreateReactionDto,
+  ) {
+    return this.databaseService.transaction(async (client) => {
+      const reactionExists = await client.query(
+        `SELECT id FROM reaction WHERE id_profile = $1 AND type_entity = 'comment'`,
+        [profileId],
+      );
+      const reaction = reactionExists.rows[0];
+
+      if (reaction) {
+        await client.query(`DELETE FROM reaction WHERE id = $1`, [reaction.id]);
+      }
+
+      await this.databaseService.query(
+        `INSERT INTO reaction (content, id_profile, type_entity, id_entity)
+              VALUES ($1, $2, 'comment', $3)`,
+        [dto.content, profileId, commentId],
+      );
+    });
   }
 }
