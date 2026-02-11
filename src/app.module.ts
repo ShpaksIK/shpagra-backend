@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { databaseConfig } from './config/database.config';
 import { ProfileModule } from './profile/profile.module';
 import { AuthModule } from './auth/auth.module';
+import { ArticleModule } from './article/article.module';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -16,6 +18,17 @@ import { AuthModule } from './auth/auth.module';
     }),
     ProfileModule,
     AuthModule,
+    ArticleModule,
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    },
   ],
 })
 export class AppModule {}

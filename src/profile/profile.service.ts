@@ -117,7 +117,7 @@ export class ProfileService {
 
   async deleteProfile(profileId: number) {
     const deletedProfile = await this.databaseService.query(
-      'UPDATE profile SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL',
+      'UPDATE profile SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL RETURNING id',
       [profileId],
     );
 

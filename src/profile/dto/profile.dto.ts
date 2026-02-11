@@ -7,8 +7,9 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { PartialType } from 'nestjs-mapped-types';
 
-export class UpdateProfileDto {
+class UpdateProfile {
   @IsOptional()
   @IsString()
   @MinLength(3)
@@ -22,7 +23,9 @@ export class UpdateProfileDto {
   username?: string;
 }
 
-export class UpdateProfileSettingsDto {
+export class UpdateProfileDto extends PartialType(UpdateProfile) {}
+
+class UpdateProfileSettings {
   @IsOptional()
   @IsBoolean()
   is_visible_articles?: boolean;
@@ -35,6 +38,10 @@ export class UpdateProfileSettingsDto {
   @IsBoolean()
   is_visible_reactions?: boolean;
 }
+
+export class UpdateProfileSettingsDto extends PartialType(
+  UpdateProfileSettings,
+) {}
 
 export class UpdateProfileFullDto {
   @ValidateNested()

@@ -31,17 +31,12 @@ updated_at  TIMESTAMPTZ,
 deleted_at TIMESTAMPTZ
 );
 
-CREATE TABLE Article_Status(
-id SERIAL PRIMARY KEY,
-name VARCHAR(50) NOT NULL
-);
-
 CREATE TABLE Article(
 id SERIAL PRIMARY KEY,
 title VARCHAR(255) NOT NULL,
 description VARCHAR(255) NOT NULL,
 content JSONB NOT NULL,
-id_article_status INTEGER NOT NULL REFERENCES Article_Status(id),
+status VARCHAR(64) NOT NULL,
 id_profile INTEGER NOT NULL REFERENCES Profile(id),
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 updated_at  TIMESTAMPTZ,
