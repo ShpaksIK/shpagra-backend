@@ -15,18 +15,21 @@ import type { Request, Response } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ValidationPipe } from 'src/validation/validation.pipe';
+import { ResponseMessage } from 'src/response/response.decorator';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ResponseMessage('Успешная регистрация')
   async register(@Body(ValidationPipe) dto: RegisterDto) {
     await this.authService.register(dto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Успешный вход')
   async login(
     @Body(ValidationPipe) dto: LoginDto,
     @Req() req: Request,
@@ -41,12 +44,12 @@ export class AuthController {
 
     return {
       access_token: tokens.access_token,
-      user: { login: dto.login },
     };
   }
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Успешный выход')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies['refresh_token'];
 
@@ -55,7 +58,6 @@ export class AuthController {
     }
 
     res.clearCookie('refresh_token');
-    return { message: 'Успешный выход' };
   }
 
   @Post('refresh')
