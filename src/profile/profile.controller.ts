@@ -13,6 +13,7 @@ import { ProfileService } from './profile.service';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateProfileFullDto } from './dto/profile.dto';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 
 @Controller('api/profiles')
 export class ProfileController {
@@ -54,7 +55,10 @@ export class ProfileController {
 
   @Put()
   @UseGuards(JwtAuthGuard)
-  async updateProfile(@Body() dto: UpdateProfileFullDto, @Req() req: Request) {
+  async updateProfile(
+    @Body(ValidationPipe) dto: UpdateProfileFullDto,
+    @Req() req: Request,
+  ) {
     const user = req.user;
 
     if (!user) {

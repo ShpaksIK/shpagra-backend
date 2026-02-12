@@ -14,20 +14,21 @@ import { RegisterDto } from './dto/register.dto';
 import type { Request, Response } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterDto) {
+  async register(@Body(ValidationPipe) dto: RegisterDto) {
     await this.authService.register(dto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
-    @Body() dto: LoginDto,
+    @Body(ValidationPipe) dto: LoginDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {

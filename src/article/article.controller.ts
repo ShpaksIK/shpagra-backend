@@ -10,6 +10,7 @@ import {
   Req,
   UnauthorizedException,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto, UpdateArticleDto } from './dto/article.dto';
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { Request } from 'express';
 import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
 import { CreateReactionDto } from './dto/reaction.dto';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 
 @Controller('api/articles')
 export class ArticleController {
@@ -29,7 +31,10 @@ export class ArticleController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createArticle(@Body() dto: CreateArticleDto, @Req() req: Request) {
+  async createArticle(
+    @Body(ValidationPipe) dto: CreateArticleDto,
+    @Req() req: Request,
+  ) {
     const user = req.user;
     if (!user) {
       throw new UnauthorizedException('Не авторизованы');
@@ -58,7 +63,7 @@ export class ArticleController {
   @UseGuards(JwtAuthGuard)
   async updateArticle(
     @Param('articleId', ParseIntPipe) articleId: number,
-    @Body() dto: UpdateArticleDto,
+    @Body(ValidationPipe) dto: UpdateArticleDto,
     @Req() req: Request,
   ) {
     const user = req.user;
@@ -79,7 +84,7 @@ export class ArticleController {
   @UseGuards(JwtAuthGuard)
   async createComment(
     @Param('articleId', ParseIntPipe) articleId: number,
-    @Body() dto: CreateCommentDto,
+    @Body(ValidationPipe) dto: CreateCommentDto,
     @Req() req: Request,
   ) {
     const user = req.user;
@@ -95,7 +100,7 @@ export class ArticleController {
   @UseGuards(JwtAuthGuard)
   async updateComment(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @Body() dto: UpdateCommentDto,
+    @Body(ValidationPipe) dto: UpdateCommentDto,
     @Req() req: Request,
   ) {
     const user = req.user;
@@ -131,7 +136,7 @@ export class ArticleController {
   @UseGuards(JwtAuthGuard)
   async createReaction(
     @Param('articleId', ParseIntPipe) articleId: number,
-    @Body() dto: CreateReactionDto,
+    @Body(ValidationPipe) dto: CreateReactionDto,
     @Req() req: Request,
   ) {
     const user = req.user;
@@ -169,7 +174,7 @@ export class ArticleController {
   @UseGuards(JwtAuthGuard)
   async createCommentReaction(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @Body() dto: CreateReactionDto,
+    @Body(ValidationPipe) dto: CreateReactionDto,
     @Req() req: Request,
   ) {
     const user = req.user;
