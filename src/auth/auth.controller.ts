@@ -7,12 +7,13 @@ import {
   Post,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import type { Request, Response } from 'express';
-import { LoginDto } from './dto/login.dto';
+import { ChangePasswordDto, LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ValidationPipe } from 'src/validation/validation.pipe';
 import { ResponseMessage } from 'src/response/response.decorator';
@@ -78,6 +79,24 @@ export class AuthController {
     return {
       access_token: tokens.access_token,
     };
+  }
+
+  @Post('changepassword')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Пароль изменен успешно')
+  async changePassword(
+    @Body(ValidationPipe) dto: ChangePasswordDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user;
+
+    if (!user) {
+      throw new UnauthorizedException('Не авторизованы');
+    }
+
+    const profileId = user['profileId'];
+
+    await this.authService.changePassword(dto, profileId);
   }
 
   private setRefreshTokenCookie(res: Response, refreshToken: string) {

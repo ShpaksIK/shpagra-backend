@@ -7,6 +7,8 @@ export class RegisterDto {
   login: string;
 
   @IsString()
+  @MinLength(5)
+  @MaxLength(256)
   password: string;
 
   @IsString()

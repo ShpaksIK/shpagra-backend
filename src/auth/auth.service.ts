@@ -10,7 +10,7 @@ import { DatabaseService } from 'src/database/database.provider';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload, Tokens } from './types/tokens.type';
 import bcrypt from 'node_modules/bcryptjs';
-import { LoginDto } from './dto/login.dto';
+import { ChangePasswordDto, LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -86,6 +86,30 @@ export class AuthService {
     await this.databaseService.query(
       'DELETE FROM sessions WHERE refresh_token = $1',
       [refreshToken],
+    );
+  }
+
+  async changePassword(dto: ChangePasswordDto, profileId: number) {
+    const result = await this.databaseService.query(
+      'SELECT password FROM profile WHERE id = $1 AND deleted_at IS NULL',
+      [profileId],
+    );
+    const profile = result.rows[0];
+
+    const isPasswordValid = await bcrypt.compare(
+      dto.currentPassword,
+      profile.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Неверный пароль');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    await this.databaseService.query(
+      'UPDATE profile SET updated_at = CURRENT_TIMESTAMP, password = $1 WHERE id = $2',
+      [hashedPassword, profileId],
     );
   }
 

@@ -7,5 +7,19 @@ export class LoginDto {
   login: string;
 
   @IsString()
+  @MinLength(5)
+  @MaxLength(255)
   password: string;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @MinLength(5)
+  @MaxLength(255)
+  password: string;
+
+  @IsString()
+  @MinLength(5)
+  @MaxLength(255)
+  currentPassword: string;
 }
