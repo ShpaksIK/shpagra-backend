@@ -11,9 +11,36 @@ export class ArticleService {
     private readonly databaseService: DatabaseService,
   ) {}
 
+  async getHomeArticles() {
+    const articles = await this.databaseService.query(
+      `SELECT 
+    a.id, a.title, a.description, a.created_at, a.updated_at, 
+    p.login as author_login, p.username as author_username,
+    (SELECT COUNT(*)::integer FROM comment c WHERE c.id_entity = a.id AND c.type_entity = 'article' AND c.deleted_at IS NULL) as comments_length,
+    (SELECT COUNT(*)::integer FROM reaction r WHERE r.id_entity = a.id AND r.type_entity = 'article') as reactions_length,
+    COALESCE(
+        (SELECT JSON_AGG(JSON_BUILD_OBJECT('id', r.id, 'content', r.content, 'author_login', rp.login))
+         FROM reaction r 
+         JOIN profile rp ON r.id_profile = rp.id
+         WHERE r.id_entity = a.id AND r.type_entity = 'article'),
+        '[]'::json
+    ) as reactions
+FROM article a
+JOIN profile p ON a.id_profile = p.id
+WHERE a.deleted_at IS NULL AND a.status = 'public'`,
+    );
+
+    return articles.rows;
+  }
+
   async getFullArticle(articleId: number) {
     const article = await this.databaseService.query(
-      'SELECT * FROM article WHERE id = $1 AND deleted_at IS NULL',
+      `SELECT a.id, a.title, a.description, a.content, a.status,
+      a.created_at, a.updated_at,
+      p.login as author_login, p.username as author_username
+      FROM article a
+      JOIN profile p ON a.id_profile = p.id
+      WHERE a.id = $1 AND a.deleted_at IS NULL AND a.status = 'public'`,
       [articleId],
     );
 
@@ -83,7 +110,8 @@ export class ArticleService {
   async getComments(articleId: number) {
     const comments = await this.databaseService.query(
       `SELECT c.id, c.content, c.created_at, c.updated_at, c.id_parent,
-      p.login, p.username FROM comment c
+      p.login as author_login, p.username as author_username,  'article' as related_type
+      FROM comment c
       JOIN profile p ON c.id_profile = p.id
       WHERE c.id_entity = $1 AND c.type_entity = 'article' AND c.deleted_at IS NULL`,
       [articleId],
@@ -158,8 +186,8 @@ export class ArticleService {
   ) {
     return this.databaseService.transaction(async (client) => {
       const reactionExists = await client.query(
-        `SELECT id FROM reaction WHERE id_profile = $1 AND type_entity = 'article'`,
-        [profileId],
+        `SELECT id FROM reaction WHERE id_profile = $1 AND id_entity = $2 AND type_entity = 'article'`,
+        [profileId, articleId],
       );
       const reaction = reactionExists.rows[0];
 
@@ -167,11 +195,13 @@ export class ArticleService {
         await client.query(`DELETE FROM reaction WHERE id = $1`, [reaction.id]);
       }
 
-      await this.databaseService.query(
+      const newReaction = await this.databaseService.query(
         `INSERT INTO reaction (content, id_profile, type_entity, id_entity)
-              VALUES ($1, $2, 'article', $3)`,
+              VALUES ($1, $2, 'article', $3) RETURNING id, content, (SELECT p.login FROM profile p WHERE p.id = id_profile) as author_login`,
         [dto.content, profileId, articleId],
       );
+
+      return newReaction.rows[0];
     });
   }
 

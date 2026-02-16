@@ -25,6 +25,12 @@ import { ResponseMessage } from 'src/response/response.decorator';
 export class ArticleController {
   constructor(private articleService: ArticleService) {}
 
+  @Get()
+  @ResponseMessage('Данные получены успешно')
+  async getHomeArticles() {
+    return await this.articleService.getHomeArticles();
+  }
+
   @Get('/:articleId')
   @ResponseMessage('Данные получены успешно')
   async getFullArticle(@Param('articleId', ParseIntPipe) articleId: number) {
