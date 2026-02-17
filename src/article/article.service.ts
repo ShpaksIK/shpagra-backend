@@ -110,7 +110,19 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
   async getComments(articleId: number) {
     const comments = await this.databaseService.query(
       `SELECT c.id, c.content, c.created_at, c.updated_at, c.id_parent,
-      p.login as author_login, p.username as author_username,  'article' as related_type
+      (SELECT pp.login 
+        FROM comment cc 
+        JOIN profile pp ON cc.id_profile = pp.id
+        LIMIT 1
+      ) as login_parent,
+      p.login as author_login, p.username as author_username, 'article' as related_type,
+	  COALESCE(
+        (SELECT JSON_AGG(JSON_BUILD_OBJECT('id', r.id, 'content', r.content, 'author_login', rp.login))
+         FROM reaction r 
+         JOIN profile rp ON r.id_profile = rp.id
+         WHERE r.id_entity = c.id AND r.type_entity = 'article'),
+        '[]'::json
+    ) as reactions
       FROM comment c
       JOIN profile p ON c.id_profile = p.id
       WHERE c.id_entity = $1 AND c.type_entity = 'article' AND c.deleted_at IS NULL`,
@@ -125,11 +137,32 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
     profileId: number,
     dto: CreateCommentDto,
   ) {
-    await this.databaseService.query(
-      `INSERT INTO comment (content, id_profile, type_entity, id_entity, id_parent)
-            VALUES ($1, $2, 'article', $3, $4)`,
+    const comment = await this.databaseService.query(
+      `WITH inserted_comment AS (
+        INSERT INTO comment (content, id_profile, type_entity, id_entity, id_parent)
+        VALUES ($1, $2, 'article', $3, $4)
+        RETURNING id, content, created_at, updated_at, id_profile, id_parent
+      )
+      SELECT 
+        ic.id, 
+        ic.content, 
+        ic.created_at, 
+        ic.updated_at, 
+        ic.id_parent,
+        (SELECT pp.login 
+          FROM comment cc 
+          JOIN profile pp ON cc.id_profile = pp.id
+          LIMIT 1
+        ) as login_parent,
+        p.login as author_login, 
+        p.username as author_username,  
+        'article' as related_type
+      FROM inserted_comment ic
+      JOIN profile p ON ic.id_profile = p.id`,
       [dto.content, profileId, articleId, dto.id_parent || null],
     );
+
+    return comment.rows[0];
   }
 
   async updateComment(
