@@ -120,7 +120,7 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
         (SELECT JSON_AGG(JSON_BUILD_OBJECT('id', r.id, 'content', r.content, 'author_login', rp.login))
          FROM reaction r 
          JOIN profile rp ON r.id_profile = rp.id
-         WHERE r.id_entity = c.id AND r.type_entity = 'article'),
+         WHERE r.id_entity = c.id AND r.type_entity = 'comment'),
         '[]'::json
     ) as reactions
       FROM comment c
@@ -156,7 +156,8 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
         ) as login_parent,
         p.login as author_login, 
         p.username as author_username,  
-        'article' as related_type
+        'article' as related_type,
+        '[]'::json as reactions
       FROM inserted_comment ic
       JOIN profile p ON ic.id_profile = p.id`,
       [dto.content, profileId, articleId, dto.id_parent || null],
@@ -181,20 +182,6 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
             WHERE id = $1 AND id_profile = $2
             AND deleted_at IS NULL RETURNING id`,
       [commentId, profileId, ...updateValues],
-    );
-
-    if (!comment.rows[0]) {
-      throw new NotFoundException('Комментарий не найден');
-    }
-  }
-
-  async deleteComment(commentId: number, profileId: number) {
-    const comment = await this.databaseService.query(
-      `UPDATE comment SET deleted_at = CURRENT_TIMESTAMP
-            WHERE id = $1 AND id_profile = $2
-            AND deleted_at IS NULL
-        RETURNING id`,
-      [commentId, profileId],
     );
 
     if (!comment.rows[0]) {
@@ -235,51 +222,6 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
       );
 
       return newReaction.rows[0];
-    });
-  }
-
-  async deleteReaction(reactionId: number, profileId: number) {
-    const reaction = await this.databaseService.query(
-      `DELETE FROM reaction WHERE id = $1 AND id_profile = $2 RETURNING id`,
-      [reactionId, profileId],
-    );
-
-    if (!reaction.rows[0]) {
-      throw new NotFoundException('Реакция не найдена');
-    }
-  }
-
-  async getCommentReactions(commentId: number) {
-    const reactions = await this.databaseService.query(
-      `SELECT id, content FROM reaction 
-      WHERE id_entity = $1 AND type_entity = 'comment'`,
-      [commentId],
-    );
-
-    return reactions.rows;
-  }
-
-  async createCommentReaction(
-    commentId: number,
-    profileId: number,
-    dto: CreateReactionDto,
-  ) {
-    return this.databaseService.transaction(async (client) => {
-      const reactionExists = await client.query(
-        `SELECT id FROM reaction WHERE id_profile = $1 AND type_entity = 'comment'`,
-        [profileId],
-      );
-      const reaction = reactionExists.rows[0];
-
-      if (reaction) {
-        await client.query(`DELETE FROM reaction WHERE id = $1`, [reaction.id]);
-      }
-
-      await this.databaseService.query(
-        `INSERT INTO reaction (content, id_profile, type_entity, id_entity)
-              VALUES ($1, $2, 'comment', $3)`,
-        [dto.content, profileId, commentId],
-      );
     });
   }
 }

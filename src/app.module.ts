@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { ArticleModule } from './article/article.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './validation/validation.pipe';
+import { CommentModule } from './comment/comment.module';
+import { ReactionModule } from './reaction/reaction.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ValidationPipe } from './validation/validation.pipe';
     ProfileModule,
     AuthModule,
     ArticleModule,
+    CommentModule,
+    ReactionModule,
   ],
   providers: [
     {
