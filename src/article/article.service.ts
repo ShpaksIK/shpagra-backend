@@ -24,7 +24,8 @@ export class ArticleService {
          JOIN profile rp ON r.id_profile = rp.id
          WHERE r.id_entity = a.id AND r.type_entity = 'article'),
         '[]'::json
-    ) as reactions
+    ) as reactions,
+    '[]'::json as comments
 FROM article a
 JOIN profile p ON a.id_profile = p.id
 WHERE a.deleted_at IS NULL AND a.status = 'public'`,
@@ -113,8 +114,13 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
       (SELECT pp.login 
         FROM comment cc 
         JOIN profile pp ON cc.id_profile = pp.id
-        LIMIT 1
+        WHERE cc.id = c.id_parent
       ) as login_parent,
+      (SELECT pp.username 
+        FROM comment cc 
+        JOIN profile pp ON cc.id_profile = pp.id
+        WHERE cc.id = c.id_parent
+      ) as username_parent,
       p.login as author_login, p.username as author_username, 'article' as related_type,
 	  COALESCE(
         (SELECT JSON_AGG(JSON_BUILD_OBJECT('id', r.id, 'content', r.content, 'author_login', rp.login))

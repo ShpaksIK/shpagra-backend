@@ -32,7 +32,7 @@ export class ProfileController {
 
     const login = user['login'];
 
-    return await this.profileService.getByLogin(login);
+    return await this.profileService.getMe(login);
   }
 
   @Get('/:profileLogin')
