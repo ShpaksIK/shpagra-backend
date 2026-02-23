@@ -88,7 +88,12 @@ export class ProfileService {
 			'id', r.id, 
 			'content', r.content, 
 			'author_login', rp.login, 
-			'type_entity', r.type_entity
+			'type_entity', r.type_entity,
+      'id_entity', r.id_entity,
+      'text', CASE
+						WHEN r.type_entity = 'article' THEN
+							(SELECT ra.title FROM article ra WHERE ra.id = r.id_entity)
+						ELSE (SELECT rc.content FROM comment rc WHERE rc.id = r.id_entity) END
 		 ))
 		 FROM reaction r 
 		 JOIN profile rp ON r.id_profile = rp.id
@@ -111,11 +116,106 @@ WHERE p.login = $1 AND p.deleted_at IS NULL`,
   async getByLogin(login: string) {
     const result = await this.databaseService.query(
       `SELECT p.id, p.login, p.username, p.created_at,
-        ps.is_visible_articles, ps.is_visible_comments,
-        ps.is_visible_reactions
-      FROM profile p
-      JOIN profile_settings ps ON p.id = ps.id_profile
-      WHERE p.login = $1 AND p.deleted_at IS NULL`,
+    ps.is_visible_articles, ps.is_visible_comments,
+    ps.is_visible_reactions,
+    CASE 
+        WHEN ps.is_visible_articles = true THEN
+            COALESCE(
+                (SELECT JSON_AGG(JSON_BUILD_OBJECT(
+                    'id', a.id, 
+                    'title', a.title, 
+                    'description', a.description, 
+                    'created_at', a.created_at, 
+                    'updated_at', a.updated_at, 
+                    'author_login', ap.login, 
+                    'author_username', ap.username,
+                    'comments_length', (SELECT COUNT(*)::integer FROM comment ac WHERE ac.id_entity = a.id AND ac.type_entity = 'article' AND ac.deleted_at IS NULL),
+                    'comments', '[]'::json,
+                    'reactions_length', (SELECT COUNT(*)::integer FROM reaction ar WHERE ar.id_entity = a.id AND ar.type_entity = 'article'),
+                    'reactions', COALESCE(
+                        (SELECT JSON_AGG(JSON_BUILD_OBJECT(
+                            'id', r.id,
+                            'content', r.content,
+                            'author_login', rp.login
+                        ))
+                        FROM reaction r
+                        JOIN profile rp ON r.id_profile = rp.id
+                        WHERE r.id_entity = a.id AND r.type_entity = 'article'),
+                        '[]'::json
+                    )))
+                    FROM article a 
+                    JOIN profile ap ON a.id_profile = ap.id
+                    WHERE a.id_profile = p.id AND a.deleted_at IS NULL),
+                '[]'::json
+            )
+        ELSE '[]'::json
+    END as articles,
+    
+    CASE 
+        WHEN ps.is_visible_comments = true THEN
+            COALESCE(
+                (SELECT JSON_AGG(JSON_BUILD_OBJECT(
+                    'id', c.id, 
+                    'content', c.content, 
+                    'created_at', c.created_at, 
+                    'updated_at', c.updated_at,
+                    'related_type', c.type_entity,
+                    'author_login', p.login,
+                    'author_username', p.username,
+                    'id_parent', c.id_parent,
+                    'login_parent', (SELECT pp.login 
+                        FROM comment cc 
+                        JOIN profile pp ON cc.id_profile = pp.id
+                        WHERE cc.id = c.id_parent
+                    ),
+                    'username_parent', (SELECT pp.username 
+                        FROM comment cc 
+                        JOIN profile pp ON cc.id_profile = pp.id
+                        WHERE cc.id = c.id_parent
+                    ),
+                    'reactions', COALESCE(
+                        (SELECT JSON_AGG(JSON_BUILD_OBJECT(
+                            'id', r.id,
+                            'content', r.content,
+                            'author_login', rp.login
+                        ))
+                        FROM reaction r
+                        JOIN profile rp ON r.id_profile = rp.id
+                        WHERE r.id_entity = c.id AND r.type_entity = 'comment'),
+                        '[]'::json
+                    )))
+                    FROM comment c 
+                    JOIN profile cp ON c.id_profile = cp.id
+                    WHERE c.id_profile = cp.id),
+                '[]'::json
+            )
+        ELSE '[]'::json
+    END as comments,
+    
+    CASE 
+        WHEN ps.is_visible_reactions = true THEN
+            COALESCE(
+                (SELECT JSON_AGG(JSON_BUILD_OBJECT(
+                    'id', r.id, 
+                    'content', r.content, 
+                    'author_login', rp.login, 
+                    'type_entity', r.type_entity,
+                    'id_entity', r.id_entity,
+                    'text', CASE
+                      WHEN r.type_entity = 'article' THEN
+                        (SELECT ra.title FROM article ra WHERE ra.id = r.id_entity)
+                      ELSE (SELECT rc.content FROM comment rc WHERE rc.id = r.id_entity) END
+                 ))
+                 FROM reaction r 
+                 JOIN profile rp ON r.id_profile = rp.id
+                 WHERE r.id_profile = p.id),
+                '[]'::json
+            )
+        ELSE '[]'::json
+    END as reactions
+FROM profile p
+JOIN profile_settings ps ON p.id = ps.id_profile
+WHERE p.login = $1 AND p.deleted_at IS NULL`,
       [login],
     );
 
