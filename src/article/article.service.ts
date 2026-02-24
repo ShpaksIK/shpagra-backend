@@ -3,6 +3,7 @@ import { DatabaseService } from 'src/database/database.provider';
 import { CreateArticleDto, UpdateArticleDto } from './dto/article.dto';
 import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
 import { CreateReactionDto } from './dto/reaction.dto';
+import { CommentsFilterType } from 'src/types/comment.type';
 
 @Injectable()
 export class ArticleService {
@@ -108,7 +109,7 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
     }
   }
 
-  async getComments(articleId: number) {
+  async getComments(articleId: number, commentsFilter: CommentsFilterType) {
     const comments = await this.databaseService.query(
       `SELECT c.id, c.content, c.created_at, c.updated_at, c.id_parent,
       (SELECT pp.login 
@@ -131,8 +132,24 @@ WHERE a.deleted_at IS NULL AND a.status = 'public'`,
     ) as reactions
       FROM comment c
       JOIN profile p ON c.id_profile = p.id
-      WHERE c.id_entity = $1 AND c.type_entity = 'article' AND c.deleted_at IS NULL`,
-      [articleId],
+      WHERE c.id_entity = $1 AND c.type_entity = 'article' AND c.deleted_at IS NULL
+      ORDER BY 
+      CASE 
+        WHEN $2 = 'new' THEN EXTRACT(EPOCH FROM c.created_at)
+        WHEN $2 = 'old' THEN EXTRACT(EPOCH FROM c.created_at)
+        WHEN $2 = 'positive' THEN (
+          SELECT COUNT(*) 
+          FROM reaction r 
+          WHERE r.id_entity = c.id AND r.type_entity = 'comment' AND r.content = 'like'
+        )
+        WHEN $2 = 'negative' THEN (
+          SELECT COUNT(*) 
+          FROM reaction r 
+          WHERE r.id_entity = c.id AND r.type_entity = 'comment' AND r.content = 'dislike'
+        )
+      END
+      ${commentsFilter === 'old' ? 'ASC' : 'DESC'};`,
+      [articleId, commentsFilter],
     );
 
     return comments.rows;

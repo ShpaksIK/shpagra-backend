@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -19,6 +20,7 @@ import { CreateCommentDto } from './dto/comment.dto';
 import { CreateReactionDto } from './dto/reaction.dto';
 import { ValidationPipe } from 'src/validation/validation.pipe';
 import { ResponseMessage } from 'src/response/response.decorator';
+import type { CommentsFilterType } from 'src/types/comment.type';
 
 @Controller('api/articles')
 export class ArticleController {
@@ -87,8 +89,11 @@ export class ArticleController {
 
   @Get('/:articleId/comments')
   @ResponseMessage('Данные получены успешно')
-  async getComments(@Param('articleId', ParseIntPipe) articleId: number) {
-    return await this.articleService.getComments(articleId);
+  async getComments(
+    @Param('articleId', ParseIntPipe) articleId: number,
+    @Query('sort') commentsFilter: CommentsFilterType,
+  ) {
+    return await this.articleService.getComments(articleId, commentsFilter);
   }
 
   @Post('/:articleId/comments')
